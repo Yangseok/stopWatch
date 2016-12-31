@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>stopWatch</title>
+    <style>
+    body {text-align: center; background: black;}
+      #time {
+        color: white;
+        height: 25px;
+        font-size: 21px;}
+      a {text-decoration: none; color:white;}
+      .startBt {display: inline-block;}
+      .stopBt {display: inline-block;}
+    </style>
+    <script>
+    var intervalObj;
+    function printTime() {
+      var time = JSON.parse(localStorage.getItem('time'));
+      var t = time.split(/[- :]/);
+      var set = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+    	var now = new Date();
+    	var gapTime = (now.getTime() - set.getTime());
+    	var gap = Math.floor(gapTime / 1000);
+    	var min = Math.floor(gap / 60);
+    	var sec = gap % 60;
+    	//console.log(gapTime);
+    	//console.log(gap);
+    	var text;
+    	if (min > 60) {
+    		var hour = Math.floor(min / 60);
+    		min = min % 60;
+    		text = leadingZeros(hour,2) + ' : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,0);
+    	} else {
+        text = '00 : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,2);
+      }
+    	document.getElementById("time").innerHTML = text;
+    }
+    function leadingZeros(n, digits) {
+      var zero = '';
+      n = n.toString();
+
+      if (n.length < digits) {
+        for (i = 0; i < digits - n.length; i++)
+          zero += '0';
+      }
+      return zero + n;
+    }
+    function getTimeStamp() {
+      var d = new Date();
+
+      var s =
+        leadingZeros(d.getFullYear(), 4) + '-' +
+        leadingZeros(d.getMonth() + 1, 2) + '-' +
+        leadingZeros(d.getDate(), 2) + ' ' +
+
+        leadingZeros(d.getHours(), 2) + ':' +
+        leadingZeros(d.getMinutes(), 2) + ':' +
+        leadingZeros(d.getSeconds(), 2);
+
+      return s;
+    }
+    function startInterval () {
+      intervalObj = setInterval('printTime()',1000);
+    }
+    function start() {
+      var d = getTimeStamp();
+      localStorage.setItem('time',JSON.stringify(d));
+      startInterval(d);
+    }
+    function stop () {
+      localStorage.clear();
+      clearInterval(intervalObj);
+      var text = "00 : 00 : 00";
+      document.getElementById("time").innerHTML = text;
+    }
+    if (JSON.parse(localStorage.getItem('time')) !== null) startInterval();
+    </script>
+  </head>
+  <body>
+    <div id='time'>00 : 00 : 00</div>
+    <div>
+      <a href='javascript:start();'>start</a>
+      <a href='javascript:stop();'>stop</a>
+      <!-- <a href='javascript:window.location.reload();'>reload</a> -->
+    </div>
+  </body>
+</html>
