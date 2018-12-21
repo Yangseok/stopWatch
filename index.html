@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <title>stopWatch</title>
     <style>
-    body {text-align: center; background: black;}
-      #time {
-        color: white;
-        height: 25px;
-        font-size: 21px;}
-      a {text-decoration: none; color:white;}
-      .startBt {display: inline-block;}
-      .stopBt {display: inline-block;}
+    body {text-align: center; background:rgb(255, 255, 255);}
+    #time {
+      color: rgb(0, 0, 0);
+      font-size: 60px;
+      font-weight:bold;
+      }
+    .btn a {
+      text-decoration: none; 
+      color:rgb(0, 23, 201);
+      display: inline-block;
+      padding:0 10px;
+    }
+    .micro {
+      display: inline-block;
+      width:30px;
+      font-size: 30px;
+    }
     </style>
     <script>
     var intervalObj;
@@ -24,15 +33,16 @@
     	var gap = Math.floor(gapTime / 1000);
     	var min = Math.floor(gap / 60);
     	var sec = gap % 60;
+      var microseconds = Math.round(gapTime % 1000 / 100);
     	//console.log(gapTime);
     	//console.log(gap);
     	var text;
     	if (min > 60) {
     		var hour = Math.floor(min / 60);
     		min = min % 60;
-    		text = leadingZeros(hour,2) + ' : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,0);
+    		text = leadingZeros(hour,2) + ' : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,0) + ' <div class="micro">' + microseconds + '</div>';
     	} else {
-        text = '00 : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,2);
+        text = '00 : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,2) + ' <div class="micro">' + microseconds + '</div>';
       }
     	document.getElementById("time").innerHTML = text;
     }
@@ -61,9 +71,10 @@
       return s;
     }
     function startInterval () {
-      intervalObj = setInterval('printTime()',1000);
+      intervalObj = setInterval('printTime()',100);
     }
     function start() {
+      reset();
       var d = getTimeStamp();
       localStorage.setItem('time',JSON.stringify(d));
       startInterval(d);
@@ -71,6 +82,9 @@
     function stop () {
       localStorage.clear();
       clearInterval(intervalObj);
+    }
+    function reset () {
+      stop();
       var text = "00 : 00 : 00";
       document.getElementById("time").innerHTML = text;
     }
@@ -79,9 +93,10 @@
   </head>
   <body>
     <div id='time'>00 : 00 : 00</div>
-    <div>
+    <div class="btn">
       <a href='javascript:start();'>start</a>
       <a href='javascript:stop();'>stop</a>
+      <a href='javascript:reset();'>reset</a>
       <!-- <a href='javascript:window.location.reload();'>reload</a> -->
     </div>
   </body>

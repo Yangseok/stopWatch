@@ -1,4 +1,6 @@
-const {app, BrowserWindow} = require('electron')
+const electron = require('electron')
+const { app, BrowserWindow } = electron
+
 const path = require('path')
 const url = require('url')
 
@@ -8,7 +10,7 @@ let win
 
 function createWindow () {
   // 새로운 브라우저 창을 생성합니다.
-  win = new BrowserWindow({width: 300, height: 80})
+  win = new BrowserWindow({ width: 356, height: 130 })
 
   // 그리고 현재 디렉터리의 index.html을 로드합니다.
   win.loadURL(url.format({
@@ -18,7 +20,7 @@ function createWindow () {
   }))
 
   // 개발자 도구를 엽니다.
-  //win.webContents.openDevTools()
+  // win.webContents.openDevTools()
 
   // 창이 닫히면 호출됩니다.
   win.on('closed', () => {
