@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>stopWatch</title>
     <style>
-    body {text-align: center; background:rgb(255, 255, 255);}
+    body {text-align: center; background:rgb(255, 255, 255); margin:0;}
     #time {
       color: rgb(0, 0, 0);
       font-size: 60px;
@@ -16,87 +16,96 @@
       display: inline-block;
       padding:0 10px;
     }
+    .watch {
+      display: inline-block;
+      vertical-align: middle;
+    }
     .micro {
       display: inline-block;
       width:30px;
       font-size: 30px;
+      vertical-align: middle;
+      padding-top:8px;
     }
     </style>
     <script>
-    var intervalObj;
-    function printTime() {
-      var time = JSON.parse(localStorage.getItem('time'));
-      var t = time.split(/[- :]/);
-      var set = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
-    	var now = new Date();
-    	var gapTime = (now.getTime() - set.getTime());
-    	var gap = Math.floor(gapTime / 1000);
-    	var min = Math.floor(gap / 60);
-    	var sec = gap % 60;
-      var microseconds = Math.round(gapTime % 1000 / 100);
-    	//console.log(gapTime);
-    	//console.log(gap);
-    	var text;
-    	if (min > 60) {
-    		var hour = Math.floor(min / 60);
-    		min = min % 60;
-    		text = leadingZeros(hour,2) + ' : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,0) + ' <div class="micro">' + microseconds + '</div>';
-    	} else {
-        text = '00 : ' + leadingZeros(min,2) + ' : ' + leadingZeros(sec,2) + ' <div class="micro">' + microseconds + '</div>';
-      }
-    	document.getElementById("time").innerHTML = text;
-    }
-    function leadingZeros(n, digits) {
-      var zero = '';
-      n = n.toString();
+      var intervalObj;
+      var timer = (function (timer, intervalObj, window) {
+        timer.printTime = function () {
+          var time = JSON.parse(localStorage.getItem('time'));
+          var t = time.split(/[- :]/);
+          var set = new Date(t[0], t[1]-1, t[2], t[3], t[4], t[5]);
+          var now = new Date();
+          var gapTime = (now.getTime() - set.getTime());
+          var gap = Math.floor(gapTime / 1000);
+          var min = Math.floor(gap / 60);
+          var sec = gap % 60;
+          var micro = Math.round(gapTime % 1000 / 100);
+          var text;
+          if (min > 60) {
+            var hour = Math.floor(min / 60);
+            min = min % 60;
+            text = '<span class="watch">' + timer.leadingZeros(hour,2) + ':' + timer.leadingZeros(min,2) + ':' + timer.leadingZeros(sec,0) + '</span><span class="micro">' + micro + '</span>';
+          } else {
+            text = '<span class="watch">' + timer.leadingZeros(min,2) + ':' + timer.leadingZeros(sec,2) + '</span><span class="micro">' + micro + '</span>';
+          }
+          document.getElementById("time").innerHTML = text;
+        }
+        timer.leadingZeros = function (n, digits) {
+          var zero = '';
+          n = n.toString();
 
-      if (n.length < digits) {
-        for (i = 0; i < digits - n.length; i++)
-          zero += '0';
-      }
-      return zero + n;
-    }
-    function getTimeStamp() {
-      var d = new Date();
+          if (n.length < digits) {
+            for (i = 0; i < digits - n.length; i++)
+              zero += '0';
+          }
+          return zero + n;
+        }
+        timer.getTimeStamp = function () {
+          var d = new Date();
+          var s =
+            timer.leadingZeros(d.getFullYear(), 4) + '-' +
+            timer.leadingZeros(d.getMonth() + 1, 2) + '-' +
+            timer.leadingZeros(d.getDate(), 2) + ' ' +
 
-      var s =
-        leadingZeros(d.getFullYear(), 4) + '-' +
-        leadingZeros(d.getMonth() + 1, 2) + '-' +
-        leadingZeros(d.getDate(), 2) + ' ' +
-
-        leadingZeros(d.getHours(), 2) + ':' +
-        leadingZeros(d.getMinutes(), 2) + ':' +
-        leadingZeros(d.getSeconds(), 2);
-
-      return s;
-    }
-    function startInterval () {
-      intervalObj = setInterval('printTime()',100);
-    }
-    function start() {
-      reset();
-      var d = getTimeStamp();
-      localStorage.setItem('time',JSON.stringify(d));
-      startInterval(d);
-    }
-    function stop () {
-      localStorage.clear();
-      clearInterval(intervalObj);
-    }
-    function reset () {
-      stop();
-      var text = "00 : 00 : 00";
-      document.getElementById("time").innerHTML = text;
-    }
-    if (JSON.parse(localStorage.getItem('time')) !== null) startInterval();
+            timer.leadingZeros(d.getHours(), 2) + ':' +
+            timer.leadingZeros(d.getMinutes(), 2) + ':' +
+            timer.leadingZeros(d.getSeconds(), 2);
+          return s;
+        }
+        timer.startInterval = function () {
+          intervalObj = setInterval('timer.printTime()',100);
+        }
+        timer.start = function () {
+          timer.stop();
+          if (JSON.parse(localStorage.getItem('time')) === null) {
+            var d = timer.getTimeStamp();
+            localStorage.setItem('time',JSON.stringify(d));
+          }
+          timer.startInterval(d);
+        }
+        timer.stop = function () {
+          clearInterval(intervalObj);
+        }
+        timer.reset = function () {
+          timer.stop();
+          localStorage.clear();
+          var text = '<span class="watch">00:00</span><span class="micro">0</span>';
+          document.getElementById("time").innerHTML = text;
+        }
+        return timer;
+      })(window.timer || {}, intervalObj, window);
+      if (JSON.parse(localStorage.getItem('time')) !== null) timer.startInterval();
     </script>
   </head>
   <body>
-    <div id='time'>00 : 00 : 00</div>
+    <div id='time'>
+      <span class="watch">00:00</span><span class="micro">0</span>
+    </div>
     <div class="btn">
-      <a href='javascript:start();'>start</a>
-      <a href='javascript:stop();'>stop</a>
-      <a href='javascript:reset();'>reset</a>
+      <a href='javascript:timer.start();'>start</a>
+      <a href='javascript:timer.stop();'>stop</a>
+      <a href='javascript:timer.reset();'>reset</a>
       <!-- <a href='javascript:window.location.reload();'>reload</a> -->
     </div>
   </body>

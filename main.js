@@ -10,7 +10,7 @@ let win
 
 function createWindow () {
   // 새로운 브라우저 창을 생성합니다.
-  win = new BrowserWindow({ width: 356, height: 130 })
+  win = new BrowserWindow({ width: 300, height: 125 })
 
   // 그리고 현재 디렉터리의 index.html을 로드합니다.
   win.loadURL(url.format({
